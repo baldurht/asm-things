@@ -19,7 +19,14 @@ _start:
   mov rax, 0
   mov rdi, 0
   mov rsi, buffer
-  mov rdx, 8
+  mov rdx, 64
+  syscall
+  mov rbx, rax
+
+  mov rax, 1
+  mov rdi, 1
+  mov rsi, buffer
+  mov rdx, rbx
   syscall
 
   mov rax, 0x3c
