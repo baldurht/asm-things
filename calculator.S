@@ -1,7 +1,7 @@
 global _start 
 
 section .data
-message_1: db "what is da numba", 0xA
+message: db "what is da numba", 0xA
 
 section .bss
 buffer resq 1
@@ -12,7 +12,7 @@ _start:
 
   mov rax, 1
   mov rdi, 1
-  lea rsi, [message_1]
+  lea rsi, [message]
   mov rdx, 17
   syscall
 
