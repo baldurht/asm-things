@@ -1,10 +1,19 @@
 global _start 
 
 section .data
-message: db "what is da numba", 0xA
+message1: db "what is da first numba", 0xA
+len1: equ $ - message1
+
+message2: db "what is da second numba", 0xA
+len2: equ $ - message2
+
+result: db "result: "
+result_len: equ $ - result
 
 section .bss
-buffer resq 1
+num1 resb 32
+num2 resb 32
+sum resb 32
 
 section .text
 
@@ -12,16 +21,16 @@ _start:
 
   mov rax, 1
   mov rdi, 1
-  lea rsi, [message]
-  mov rdx, 17
+  lea rsi, [message1]
+  mov rdx, len1
   syscall
 
   mov rax, 0
   mov rdi, 0
-  mov rsi, buffer
-  mov rdx, 64
+  mov rsi, num1
+  mov rdx, 32
   syscall
-  mov rbx, rax
+  mov r8, rax
 
   mov rax, 1
   mov rdi, 1
@@ -32,3 +41,22 @@ _start:
   mov rax, 0x3c
   xor rdi, rdi
   syscall
+
+
+ascii_to_int:
+  xor rax, rax
+  xor rcx, rcx
+
+
+.next_digit:
+  mov bl, byte [rsi + rcx]
+  cmp bl, 0xA
+  je .done
+  sub bl, '0'
+  imul rax, rax, 10
+  add rax, rbx
+  inc rcx
+  jmp .next_digit
+
+.done:
+  ret
