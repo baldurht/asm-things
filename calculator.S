@@ -7,13 +7,13 @@ len1: equ $ - message1
 message2: db "what is da second numba", 0xA
 len2: equ $ - message2
 
-result: db "result: "
-result_len: equ $ - result
+result_msg: db "result: ", 0xA
+result_len: equ $ - result_msg
 
 section .bss
 num1 resb 32
 num2 resb 32
-sum resb 32
+sum resq 1
 
 section .text
 
@@ -26,38 +26,44 @@ _start:
   mov rdx, len1
   syscall
 
-  ; read first input 
+  ; read first number
   mov rax, 0
   mov rdi, 0
   mov rsi, num1
   mov rdx, 32
   syscall
-  mov r8, rax
 
+  ; convert first input to integer
+  lea rsi, [num1]
+  call ascii_to_int
+  mov rbx, rax 
 
-  ; write second message 
+  ; write second message
   mov rax, 1
   mov rdi, 1
   lea rsi, [message2]
   mov rdx, len2
   syscall
 
-  ; read second input
+  ; read second number
   mov rax, 0
   mov rdi, 0
   mov rsi, num2
   mov rdx, 32
   syscall
-  mov r8, rax
 
+  ; convert second input to integer
+  lea rsi, [num2]
+  call ascii_to_int
+  add rbx, rax  
 
+  mov [sum], rbx
 
-jmp exit
+  jmp exit
 
 ascii_to_int:
-  xor rax, rax
+  xor rax, rax 
   xor rcx, rcx
-
 
 .next_digit:
   mov bl, byte [rsi + rcx]
