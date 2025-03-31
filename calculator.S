@@ -19,12 +19,14 @@ section .text
 
 _start:
 
+  ; write first message
   mov rax, 1
   mov rdi, 1
   lea rsi, [message1]
   mov rdx, len1
   syscall
 
+  ; read first input 
   mov rax, 0
   mov rdi, 0
   mov rsi, num1
@@ -32,12 +34,15 @@ _start:
   syscall
   mov r8, rax
 
+
+  ; write second message 
   mov rax, 1
   mov rdi, 1
   lea rsi, [message2]
   mov rdx, len2
   syscall
 
+  ; read second input
   mov rax, 0
   mov rdi, 0
   mov rsi, num2
@@ -67,7 +72,7 @@ ascii_to_int:
 .done:
   ret
 
-
+; exit
 exit:
   mov rax, 0x3c
   xor rdi, rdi
