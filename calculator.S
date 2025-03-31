@@ -34,14 +34,20 @@ _start:
 
   mov rax, 1
   mov rdi, 1
-  mov rsi, buffer
-  mov rdx, rbx
+  lea rsi, [message2]
+  mov rdx, len2
   syscall
 
-  mov rax, 0x3c
-  xor rdi, rdi
+  mov rax, 0
+  mov rdi, 0
+  mov rsi, num2
+  mov rdx, 32
   syscall
+  mov r8, rax
 
+
+
+jmp exit
 
 ascii_to_int:
   xor rax, rax
@@ -60,3 +66,9 @@ ascii_to_int:
 
 .done:
   ret
+
+
+exit:
+  mov rax, 0x3c
+  xor rdi, rdi
+  syscall
