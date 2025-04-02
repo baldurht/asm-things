@@ -90,7 +90,6 @@ _start:
   mov rdx, result_len
   syscall
 
-  ; TODO
   call decide_operator
   
   ; convert sum to ascii
