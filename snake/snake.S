@@ -9,6 +9,9 @@ section .bss
 
 ; TODO sikkert gjøre loopsa til functions
 ; TODO gjøre koden mer lett lest?
+; TODO finne ut hvordan jeg kan time loopsene.
+;      liksom ha x antal loops i sekundet 
+;  
 
 section .text
 _start:
