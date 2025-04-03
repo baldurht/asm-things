@@ -17,11 +17,19 @@ section .bss
 section .text
 _start:
 
-  mov r14, 0x20
-  mov rax, 1
-  mov rdi, 1
-  mov rdx, 1
-  lea rsi, [dash]
+; TODO r13 = y r15 = x
+; TODO r8 = x r9 = y
+; TODO want to save the cords in one register
+mov r8, 0x08
+mov r9, 0x16
+
+game_loop:
+
+mov r14, 0x20
+mov rax, 1
+mov rdi, 1
+mov rdx, 1
+lea rsi, [dash]
 roof_loop:
   syscall
   dec r14
@@ -30,13 +38,6 @@ roof_loop:
 
 lea rsi, [newline]
 syscall
-
-
-; TODO r13 = y r15 = x
-; TODO r8 = x r9 = y
-; TODO want to save the cords in one register
-mov r8, 0x08
-mov r9, 0x16
 
 mov r13, 0x16
 wall_loop:
@@ -104,8 +105,10 @@ floor_loop:
   
   lea rsi, [newline]
   syscall
+
+jmp game_loop
   
-  ; Exit program
-  mov rax, 60
-  xor rdi, rdi
-  syscall
+; exit program
+mov rax, 60
+xor rdi, rdi
+syscall
