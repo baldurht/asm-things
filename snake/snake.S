@@ -34,6 +34,7 @@ syscall
 
 ; TODO r13 = y r15 = x
 ; TODO r8 = x r9 = y
+; TODO want to save the cords in one register
 mov r8, 0x08
 mov r9, 0x16
 
