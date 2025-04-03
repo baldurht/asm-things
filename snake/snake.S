@@ -33,7 +33,7 @@ syscall
 
 
 ; TODO r13 = y r15 = x
-; TODO rbx bh = x bl = y
+; TODO r8 = x r9 = y
 mov r8, 0x08
 mov r9, 0x16
 
