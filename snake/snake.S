@@ -4,6 +4,7 @@ section .data
   dash: db "-"
   newline: db 0xA
   space: db "."
+  snake_head: db "#"
   
 section .bss
 
@@ -30,39 +31,80 @@ roof_loop:
 lea rsi, [newline]
 syscall
 
+
+; TODO r13 = y r15 = x
+; TODO rbx bh = x bl = y
+mov r8, 0x08
+mov r9, 0x16
+
 mov r13, 0x16
 wall_loop:
   lea rsi, [pipe]
   syscall
+
+  cmp r13, r8
+  je snake_row
+
   lea rsi, [space]
   mov r15, 0x1e
   space_loop:
-    ; TODO her må jeg sjekke hvor slangen er og ha en cmp
     syscall
     dec r15
-    cmp r15, 0
-    jg space_loop
-  lea rsi, [pipe]
-  syscall
-  lea rsi, [newline]
-  syscall
-  dec r13
-  test r13, r13
-  jnz wall_loop
+    test r15, r15
+    jnz space_loop
+    jmp end_row
 
+  snake_row:
+    lea rsi, [space]
+    mov r15, 0x1e
 
-mov r10, 0x20
-lea rsi, [dash]
+  snake_space_loop:
+    cmp r15, r9
+    je print_snake
+    syscall
+    dec r15
+    test r15, r15
+    jnz snake_space_loop
+    jmp end_row
+  
+  print_snake:
+    lea rsi, [snake_head]
+    syscall
+    dec r15
+
+    lea rsi, [space]
+    test r15, r15
+    jz end_row
+  
+  remaining_spaces:
+    syscall
+    dec r15
+    test r15, r15
+    jnz remaining_spaces
+
+  end_row:
+    lea rsi, [pipe]
+    syscall
+    lea rsi, [newline]
+    syscall
+
+    dec r13
+    test r13, r13
+    jnz wall_loop
+    
+    mov r10, 0x20
+    lea rsi, [dash]
+
 floor_loop:
   syscall
   dec r10
   test r10, r10
   jnz floor_loop
-
-lea rsi, [newline]
-syscall
-
-  ; exit program
+  
+  lea rsi, [newline]
+  syscall
+  
+  ; Exit program
   mov rax, 60
   xor rdi, rdi
   syscall
