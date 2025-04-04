@@ -4,10 +4,15 @@ section .data
   dash: db "-"
   newline: db 0xA
   space: db "."
-  snake_head: db "#"
+  snake_head: db "@"
   clear_screen: db 27, "[2J", 27, "[H" ; ANSI escape sequence to clear screen and set cursor
   clear_len equ $ - clear_screen
   
+  time:
+    dq 0              ; tv_sec
+    dq 100000000      ; tv_nsec (100ms = 0.1s)
+
+
 section .bss
 
 ; TODO sikkert gjøre loopsa til functions
@@ -27,27 +32,29 @@ mov r8, 0x08
 mov r9, 0x16
 
 game_loop:
+
   mov rax, 1
   mov rdi, 1
   mov rsi, clear_screen
   mov rdx, clear_len
   syscall
 
-  mov r14, 0x20
+  xor r13, r13
+  xor r14, r14
+
   mov rax, 1
   mov rdi, 1
   mov rdx, 1
   lea rsi, [dash]
   roof_loop:
     syscall
-    dec r14
-    test r14, r14
-    jnz roof_loop
+    inc r14
+    cmp r14, 0x20
+    jne roof_loop
 
   lea rsi, [newline]
   syscall
 
-  mov r13, 0x16
   wall_loop:
     lea rsi, [pipe]
     syscall
@@ -98,9 +105,9 @@ game_loop:
       lea rsi, [newline]
       syscall
 
-      dec r13
-      test r13, r13
-      jnz wall_loop
+      inc r13
+      cmp r13, 0x16
+      jne wall_loop
       
       mov r10, 0x20
       lea rsi, [dash]
@@ -113,11 +120,20 @@ game_loop:
     
     lea rsi, [newline]
     syscall
-  inc r8
 
+
+  mov rax, 0x23 ; nanosleep
+  lea rdi, [time]
+  mov rsi, 0
+  syscall
+
+
+  
   jmp game_loop
     
 ; exit program
 mov rax, 60
 xor rdi, rdi
 syscall
+
+
