@@ -151,8 +151,8 @@ decide_operator:
 
   .divide:
     mov rax, r14
-    xor rdx, rdx
-    div r15
+    cdq
+    idiv r15
     ret
   
 
@@ -162,6 +162,15 @@ decide_operator:
 ascii_to_int:
   xor rax, rax
   xor rcx, rcx
+  ; r9 = sign flag (0 = positive, 1 = negative)
+  xor r9, r9
+  
+  ; Check for negative sign
+  movzx rbx, byte [rsi]
+  cmp rbx, '-'
+  jne .next_digit
+  mov r9, 1
+  inc rcx
   
 .next_digit:
   cmp rcx, rdx
@@ -180,54 +189,69 @@ ascii_to_int:
   jmp .next_digit
   
 .done:
+  test r9, r9
+  jz .return
+  neg rax
+  
+.return:
   ret
 
 ; convert integer to ASCII
 int_to_ascii:
-  push rdi
+  mov rbx, rax
   mov rcx, 0
   mov r8, 10
-
-  test rax, rax
-  jnz .convert_loop
-  mov byte [rdi], '0'
-  mov rcx, 1
-  jmp .done
-
-.convert_loop:
-  test rax, rax
-  jz .reverse
   
+  ; check if number is negative
+  test rbx, rbx
+  jns .convert_loop
+  
+  ; handle negative number
+  mov byte [rdi], '-'
+  inc rdi
+  neg rax
+  mov r9, 1
+  
+.convert_loop:
   xor rdx, rdx
   div r8
   
   add dl, '0'
   mov [rdi + rcx], dl
   inc rcx
-  jmp .convert_loop
-
-.reverse:
-  pop rdi
-  push rcx
-  dec rcx
-  mov rsi, 0
-
-.reverse_loop:
-  cmp rsi, rcx
-  jge .end_reverse
   
-  mov al, [rdi + rsi]
-  mov ah, [rdi + rcx]
-  mov [rdi + rcx], al
-  mov [rdi + rsi], ah
+  test rax, rax
+  jnz .convert_loop
+  
+  test r9, r9
+  jz .reverse_string
+  
+  sub rdi, 1
+  inc rcx
+  
+.reverse_string:
+  mov rsi, 0
+  
+  test r9, r9
+  jz .normal_reverse
+  inc rsi
+  
+.normal_reverse:
+  mov rdx, rcx
+  dec rdx
+  
+.reverse_loop:
+  cmp rsi, rdx
+  jge .done
+  
+  movzx r10, byte [rdi + rsi]
+  movzx r11, byte [rdi + rdx]
+  mov byte [rdi + rsi], r11b
+  mov byte [rdi + rdx], r10b
   
   inc rsi
-  dec rcx
+  dec rdx
   jmp .reverse_loop
-
-.end_reverse:
-  pop rcx
-
+  
 .done:
-  mov byte [rdi + rcx], 0
   ret
